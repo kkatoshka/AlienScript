@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Alien Script</title>
+<link rel="stylesheet" type="text/css" href="style.css"/>
+<script src="Tone.js"></script>
+<script>
+const synth = new Tone.Synth().toDestination();
+
+function docClick(e){
+	if(e.target.classList.contains('symbol')){
+		e.target.remove();
+	}else if(document.fullscreenElement) {
+		document.exitFullscreen();
+	}else{
+		document.documentElement.requestFullscreen();
+	}
+}
+
+function randTone(){
+	let tones = Array('C#', 'D#', 'F#', 'G#', 'A#');
+	let randTone = tones[Math.floor(Math.random() * tones.length)];
+	synth.triggerAttackRelease(randTone + "4", "8n");
+}
+
+function randSymbol(){
+	return 'abcdefghijklmnopqrstuvwxyz0123456789'.charAt(Math.floor(Math.random() * 36));
+}
+
+function randColor(){
+	let output = '';
+	for (let i = 0; i < 6; ++i) {
+		output += '0123456789ABCDEF'.charAt(Math.floor(Math.random() * 16));
+	}
+	return output;
+}
+
+function typeSymbol(e){
+	let container = document.getElementById('container');
+	switch(e.code){
+		case 'Backspace':
+			if(container.hasChildNodes()){
+				container.removeChild(container.lastElementChild);
+				randTone();
+			}
+			break;
+		case 'Delete':
+			if(container.hasChildNodes()){
+				container.removeChild(container.firstElementChild);
+				randTone();
+			}
+			break;
+		case 'Space':
+			let symbol = document.createElement("DIV");
+			symbol.className = "symbol";
+			symbol.style.backgroundColor = "#" + randColor();
+			symbol.style.color = "#" + randColor();
+			symbol.innerHTML = randSymbol();
+			container.appendChild(symbol);
+			randTone();
+			symbol.addEventListener("mouseenter", function(e){
+				randTone();
+			});
+			break;
+		default:
+			if(e.code.length == 4 && e.code.substring(0,3) == 'Key'){
+				let symbol = document.createElement("DIV");
+				symbol.className = "symbol";
+				symbol.style.backgroundColor = "#" + randColor();
+				symbol.style.color = "#" + randColor();
+				symbol.innerHTML = e.code.substr(3);
+				container.appendChild(symbol);
+				randTone();
+				symbol.addEventListener("mouseenter", function(e){
+					randTone();
+				});
+			}
+	}
+}
+
+document.addEventListener('keydown', typeSymbol);
+document.addEventListener('click', docClick);
+</script>
+</head>
+<body>
+<div id="container"></div>
+</body>
+</html>
